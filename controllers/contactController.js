@@ -3,8 +3,7 @@ const asyncHandler = require("express-async-handler");
 //@desc GET all contact
 //@access private
 const getAllContacts = async (req, res) => {
-  console.log(req);
-  const contacts = await Contact.find({userId: req.user.id});
+  const contacts = await Contact.find({ userId: req.user.id });
   res.status(200).json({ contacts });
 };
 
@@ -16,7 +15,13 @@ const createContact = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Please provide name, email and phone number");
   }
-  const contact = await Contact.create({ name, email, phone, userId: req.user.id });
+  const contact = await Contact.create({
+    name,
+    email,
+    phone,
+    contactProfilPath: null,
+    userId: req.user.id,
+  });
   res.status(200).json(contact);
 });
 
@@ -29,9 +34,9 @@ const getContact = asyncHandler(async (req, res) => {
     throw new Error("Contact not found");
   }
 
-  if(contact.userId.toString() !== req.user.id){
-    res.status(403)
-    throw new Error("Your're not authorized to perform this action")
+  if (contact.userId.toString() !== req.user.id) {
+    res.status(403);
+    throw new Error("Your're not authorized to perform this action");
   }
 
   res.status(200).json(contact);
@@ -46,18 +51,22 @@ const updateContact = asyncHandler(async (req, res) => {
     throw new Error("Please provide name, email and phone number");
   }
 
-  if(contact.userId.toString() !== req.user.id){
-    res.status(403)
-    throw new Error("Your're not authorized to perform this action")
+  if (contact.userId.toString() !== req.user.id) {
+    res.status(403);
+    throw new Error("Your're not authorized to perform this action");
   }
 
   const contact = await Contact.findById(req.params.id);
   if (!contact) {
     res.status(404);
-    throw new Error()
+    throw new Error();
   }
 
-  const contactUpdate = await Contact.findByIdAndUpdate(req.params.id, req.body, {new: true});
+  const contactUpdate = await Contact.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
   res.status(200).json(contactUpdate);
 });
 
@@ -67,15 +76,15 @@ const deleteContact = asyncHandler(async (req, res) => {
   const contact = await Contact.findById(req.params.id);
   if (!contact) {
     res.status(404);
-    throw new Error("Not found")
+    throw new Error("Not found");
   }
 
-  if(contact.userId.toString() !== req.user.id){
-    res.status(403)
-    throw new Error("Your're not authorized to perform this action")
+  if (contact.userId.toString() !== req.user.id) {
+    res.status(403);
+    throw new Error("Your're not authorized to perform this action");
   }
 
-  await Contact.deleteOne()
+  await Contact.deleteOne();
   res.status(200).json(contact);
 });
 

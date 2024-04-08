@@ -15,6 +15,9 @@ const userModel = mongoose.Schema(
       type: String,
       required: [true, "Please enter a password"],
     },
+    userProfilPath: {
+      type: String,
+    }
   },
   {
     timestamps: true,

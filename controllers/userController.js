@@ -23,9 +23,9 @@ const registerUser = asyncHandler(async (req, res) => {
     username,
     email,
     password: hashPassword,
+    userProfilPath: null
   });
 
-  console.log("User created! ", user);
   if (user) {
     res.status(201).json({ _id: user._id, username: user.username });
   } else {
@@ -54,7 +54,7 @@ const loginUser = asyncHandler(async (req, res) => {
       },
       process.env.SECRET_ACCESS_TOKEM,
       {
-        expiresIn: "15m",
+        expiresIn: "24h",
       }
     );
     res.status(200).json({ accessToken });
@@ -64,11 +64,32 @@ const loginUser = asyncHandler(async (req, res) => {
   }
 });
 
-//desc POST user
+//desc GET user
 //access private
 const currentUser = asyncHandler(async (res, req) => {
-  console.log();
   res.json({ message: "Current user informations" });
 });
 
-module.exports = { registerUser, loginUser, currentUser };
+//desc PUT user
+//access private
+const updateUser = asyncHandler(async (req, res) => {
+  let userProfilPath;
+  if (req.file) {
+    userProfilPath = "/uploads/userProfiles/" + req.file.filename;
+  }
+  let user = await User.findByIdAndUpdate(
+    req.params.id,
+    { ...req.body, userProfilPath },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  if (!user) {
+    res.status(401);
+    throw new Error("No user found with this ID!");
+  }
+  res.status(200).json(user);
+});
+
+module.exports = { registerUser, loginUser, currentUser, updateUser };
