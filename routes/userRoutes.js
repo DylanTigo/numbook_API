@@ -14,7 +14,7 @@ router.post("/register", registerUser);
 
 router.post("/login", loginUser);
 
-router.get("/current", validateToken, currentUser);
+router.get("/current/:id", validateToken, currentUser);
 
 router.put("/update/:id", uploadUserImg.single("profileImg"), validateToken, updateUser);
 

@@ -23,7 +23,7 @@ const registerUser = asyncHandler(async (req, res) => {
     username,
     email,
     password: hashPassword,
-    userProfilPath: null
+    userProfilPath: null,
   });
 
   if (user) {
@@ -57,17 +57,18 @@ const loginUser = asyncHandler(async (req, res) => {
         expiresIn: "24h",
       }
     );
-    res.status(200).json({ accessToken });
+    res.status(200).json({ accessToken, username: user.username,  id: user._id });
   } else {
     res.status(401);
     throw new Error("Email or password is not valid");
   }
 });
 
-//desc GET user
+//desc GET user's informations
 //access private
-const currentUser = asyncHandler(async (res, req) => {
-  res.json({ message: "Current user informations" });
+const currentUser = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user.id)
+  res.json({ user });
 });
 
 //desc PUT user

@@ -4,14 +4,14 @@ const asyncHandler = require("express-async-handler");
 //@access private
 const getAllContacts = async (req, res) => {
   const contacts = await Contact.find({ userId: req.user.id });
-  res.status(200).json({ contacts });
+  res.status(200).json(contacts);
 };
 
-//desc POST contact
+//desc POST add contact
 //access private
 const createContact = asyncHandler(async (req, res) => {
   const { name, email, phone } = req.body;
-  if (!name || !email || !phone) {
+  if (!name || !phone) {
     res.status(400);
     throw new Error("Please provide name, email and phone number");
   }
