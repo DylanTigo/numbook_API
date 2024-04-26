@@ -38,7 +38,7 @@ const registerUser = asyncHandler(async (req, res) => {
 //desc POST login user
 //access public
 const loginUser = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, rememberMe } = req.body;
   if (!email || !password) {
     res.status(400);
     throw new Error("Please enter all fields");
@@ -46,7 +46,10 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ email });
   if (user && (await bcrypt.compare(password, user.password))) {
-    const accessToken = jwt.sign(
+    let expiresIn;
+    rememberMe ? (expiresIn = 30 * 24) : (expiresIn = 24);
+
+    const token = jwt.sign(
       {
         username: user.username,
         email: user.email,
@@ -54,10 +57,10 @@ const loginUser = asyncHandler(async (req, res) => {
       },
       process.env.SECRET_ACCESS_TOKEM,
       {
-        expiresIn: "24h",
+        expiresIn: expiresIn+"h",
       }
     );
-    res.status(200).json({ accessToken, username: user.username,  id: user._id });
+    res.status(200).json({ token });
   } else {
     res.status(401);
     throw new Error("Email or password is not valid");
@@ -67,7 +70,7 @@ const loginUser = asyncHandler(async (req, res) => {
 //desc GET user's informations
 //access private
 const currentUser = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user.id)
+  const user = await User.findById(req.user.id);
   res.json({ user });
 });
 
